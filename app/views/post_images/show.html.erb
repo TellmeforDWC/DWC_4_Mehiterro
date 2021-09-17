@@ -1,30 +1,65 @@
+<!--投稿画面始め-->
 <div>
+
   <%= attachment_image_tag @post_image, :image %>
   <p>ショップ名：<%= @post_image.shop_name %></p>
   <p>説明：<%= @post_image.caption %></p>
   <p>ユーザー名：<%= @post_image.user.name %></p>
   <p>投稿日時：<%= @post_image.created_at.strftime("%y/%m/%d") %></p>
 
-  <%= link_to "Back", post_images_path %>
-
   <% if @post_image.user == current_user %>
-  <%= link_to "Delete", post_image_path(@post_image), method: :delete %>
+  <%= link_to "投稿削除", post_image_path(@post_image), method: :delete %>
   <% end %>
 
 </div>
+<!--投稿画面終わり-->
 
+<!--コメント機能始め-->
 <div>
+  <!--コメントステータス表示始め-->
   <p>コメント件数：<%= @post_image.post_comments.count %></p>
   <% @post_image.post_comments.each do |post_comment| %>
     <p><%= image_tag("sample-author1.jpg") %></p>
     <%= post_comment.user.name %>
-    <%= post_comment.created_at.strftime("%y/%m/%d") %>
+    <%= post_comment.created_at.strftime("%y/%m/%d") %><%= post_comment.comment %>
+  <!--コメントステータス表示終わり-->
+    <!--コメント削除機能始め-->
+    <% if post_comment.user == current_user %>
+    <div>
+      <%= link_to "コメント削除", post_image_post_comment_path(post_comment.post_image.id, post_comment.id), method: :delete %>
+    </div>
+    <% end %>
+    <!--コメント削除機能終わり-->
+  <% end %>　<!--ブロック変数"post_comment"閉じ-->
+<!--コメント機能終わり-->
+
+
+<!--イイね！機能始め-->
+  <% if @post_image.favorited_by?(current_user) %>
+    <p>
+      <%= link_to post_image_favorite_path(@post_image), method: :delete do %>
+        ♥<%= @post_image.favorites.count %>イイね！
+      <% end %>
+    </p>
+  <% else %>
+    <p>
+      <%= link_to post_image_favorite_path(@post_image), method: :post do %>
+        ♡<%= @post_image.favorites.count %>イイね！
+      <% end %>
+    </p>
   <% end %>
+<!--イイね！機能終わり-->
+
 </div>
 
 <div>
+<!--コメント投稿フォーム始め-->
   <%= form_with(model:[@post_image, @post_comment], local: true) do |f| %>
-    <%= f.text_area :comment, rows:"5", placeholder"Comment Here!" %>
+    <%= f.text_area :comment, rows:"5", placeholder:"Comment Here!" %>
     <%= f.submit "送信" %>
   <% end %>
+<!--コメント投稿フォーム終わり-->
+
+  <%= link_to "戻る", post_images_path %>
+
 </div>
